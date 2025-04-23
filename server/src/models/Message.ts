@@ -1,16 +1,21 @@
-import mongoose from "mongoose";
-export interface IMessage {
-  from: mongoose.Types.ObjectId;
-  toRoom?: mongoose.Types.ObjectId;
-  toUser?: mongoose.Types.ObjectId;
-  content: string;
-  timestamp: Date;
+import { IUser, User } from "./User";
+import { Schema, model, Document, Types } from "mongoose";
+
+export interface IMessage extends Document {
+  room: Types.ObjectId;
+  sender: IUser;
+  text: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
-const MessageSchema = new mongoose.Schema<IMessage>({
-  from: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  toRoom: { type: mongoose.Schema.Types.ObjectId, ref: "Room" },
-  toUser: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  content: { type: String, required: true },
-  timestamp: { type: Date, default: Date.now },
-});
-export default mongoose.model<IMessage>("Message", MessageSchema);
+
+const messageSchema = new Schema<IMessage>(
+  {
+    room: { type: Schema.Types.ObjectId, ref: "ChatRoom", required: true },
+    sender: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    text: { type: String, required: true },
+  },
+  { timestamps: true }
+);
+
+export const Message = model<IMessage>("Message", messageSchema);

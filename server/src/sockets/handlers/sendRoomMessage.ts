@@ -1,5 +1,5 @@
-import { Server, Socket } from "socket.io";
 import type { RPCHandler } from "../types";
+import { Message } from "../../models/Message";
 
 export const sendRoomMessage: RPCHandler = async (io, socket, params) => {
   const { roomId, text } = params;
@@ -7,20 +7,36 @@ export const sendRoomMessage: RPCHandler = async (io, socket, params) => {
     throw new Error("Invalid parameters for sendRoomMessage");
   }
 
-  // Build (and in the future, persist) the message
-  const message = {
-    _id: Date.now().toString(),
+  // Store to db
+  const created = await Message.create({
+    room: roomId,
+    sender: socket.data.user.id,
     text,
-    sender: socket.data.user, // word of caution: socket.data.user must be set in your auth middleware
-    createdAt: new Date(),
+  });
+
+  // Populate sender’s username for the broadcast
+  await created.populate<{ sender: { username: string } }>(
+    "sender",
+    "username"
+  );
+
+  // the outgoing message
+  const message = {
+    _id: created.id.toString(),
+    text: created.text,
+    sender: {
+      id: created.sender.id.toString(),
+      username: created.sender.username,
+    },
+    createdAt: created.createdAt.toISOString(),
   };
 
-  // Broadcast to that room
+  // Broadcast only to that room
   io.to(roomId).emit("rpc", {
     method: "newRoomMessage",
     params: { roomId, message },
   });
 
-  // Return anything you want the sender’s ack to receive
-  return { success: true };
+  // Ack back the saved message
+  return message;
 };

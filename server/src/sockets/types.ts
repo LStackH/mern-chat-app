@@ -12,7 +12,7 @@ export interface JWTData {
 
 /**
  * Signature for every handler:
- *  - io: the Server instance (so you can broadcast, etc.)
+ *  - io: the Server instance (broadcast, etc.)
  *  - socket: the current client socket
  *  - params: RPC params payload
  * Returns either a value (to send via reply) or throws on error.

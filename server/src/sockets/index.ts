@@ -8,6 +8,7 @@ import type {
   RPCMessage,
 } from "./types";
 import { rpcDispatcher } from "./rpcDispatcher";
+import { addOnlineUser, removeOnlineUser } from "./onlineUsers";
 
 export function initializeSockets(
   io: Server<
@@ -32,6 +33,12 @@ export function initializeSockets(
 
   io.on("connection", (socket) => {
     console.log("Client connected:", socket.id, socket.data.user.username);
+    const me = { id: socket.data.user.id, username: socket.data.user.username };
+    addOnlineUser(me);
+    io.emit("rpc", {
+      method: "userStatus",
+      params: { userId: me.id, username: me.username, status: "online" },
+    });
 
     // On rpc call from client, send the msg.method to rpcDispatcher to figure out what to do
     socket.on(
@@ -56,6 +63,11 @@ export function initializeSockets(
 
     socket.on("disconnect", () => {
       console.log("Client disconnected:", socket.id);
+      removeOnlineUser(me.id);
+      io.emit("rpc", {
+        method: "userStatus",
+        params: { userId: me.id, status: "offline" },
+      });
     });
   });
 }

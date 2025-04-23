@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import Room from "../models/Room";
-import Message from "../models/Message";
+import { Message } from "../models/Message";
 
 // @desc    List all available rooms
 // @route   GET /api/chat/rooms
