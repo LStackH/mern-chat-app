@@ -49,7 +49,7 @@ const OnlineUsersList: React.FC<Props> = ({ socket }) => {
   }, [socket]);
 
   return (
-    <div className="flex flex-col w-1/5 min-w-[150px] h-full border-l overflow-hidden">
+    <div className="flex flex-col w-1/5 min-w-[100px] h-full border-l overflow-hidden">
       <div className="flex-none p-4 text-xl font-semibold border-b">
         Online Users
       </div>

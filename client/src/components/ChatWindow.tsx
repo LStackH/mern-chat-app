@@ -49,7 +49,7 @@ export default function ChatWindow({ socket, roomId }: ChatWindowProps) {
     <div className="p-4 flex flex-col space-y-2 border-gray-500 scroll-">
       {messages.map((msg) => {
         const isMine = msg.sender.id === currentUserId;
-        const alignment = isMine ? 'justify-start' : 'justify-end' ;
+        const alignment = isMine ? 'justify-end' : 'justify-start' ;
         const bgColor   = isMine ? 'bg-blue-200 border border-black' : 'bg-slate-200 border border-black' ;
 
         // format HH:MM
@@ -70,7 +70,7 @@ export default function ChatWindow({ socket, roomId }: ChatWindowProps) {
                 <span className="text-lg font-semibold">{msg.sender.username}</span>
                 <div className='flex-col items-baseline space-x-0.5'>
                   <span className="text-xs text-gray-500">( {date}</span>
-                  <span className="text-xs text-gray-400">/</span>
+                  <span className="text-xs text-gray-400">|</span>
                   <span className="text-xs text-gray-500">{time} )</span>
                 </div>
               </div>
