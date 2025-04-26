@@ -13,13 +13,12 @@ function App() {
         <Route element={<MainLayout></MainLayout>}>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="*" element={<LoginPage />} />
         </Route>
 
         <Route element={<ChatLayout/>}>
           <Route path="/welcome" element={<WelcomePage />} />
         </Route>
-
-        <Route path="*" element={<LoginPage />} />
       </Routes>
     </Router>
   )

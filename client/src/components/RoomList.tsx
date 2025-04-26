@@ -1,8 +1,8 @@
-// src/components/RoomList.tsx
 import React, { useState, useEffect } from 'react';
 import type { Socket } from 'socket.io-client';
+import RoomListItem from './RoomListItem';
 
-interface Room {
+export interface Room {
   _id: string;
   name: string;
 }
@@ -36,6 +36,10 @@ const RoomList: React.FC<RoomListProps> = ({ socket, onRoomSelected }) => {
           if (prev.some((r) => r._id === room._id)) return prev;
           return [...prev, room];
         });
+      } else if (msg.method === "roomsUpadted"){
+        if (msg.method === "roomsUpdated"){
+          setRooms(msg.params.rooms);
+        }
       }
     };
     socket.on('rpc', handleRpc);
@@ -59,6 +63,35 @@ const RoomList: React.FC<RoomListProps> = ({ socket, onRoomSelected }) => {
     );
   };
 
+  const handleRename = (room: Room) => {
+      const newName = prompt('New name for room:', room.name);
+      if (!newName?.trim()) return;
+      socket.emit(
+        'rpc',
+        { method: 'renameRoom', params: { roomId: room._id, newName } },
+        (err: any) => {
+          if (err) console.error(err);
+          else setRooms((rs) =>
+            rs.map((r) => (r._id === room._id ? { ...r, name: newName } : r))
+          );
+        }
+      );
+    };
+    
+    const handleDelete = (room: Room) => {
+      if (!confirm(`Delete room "${room.name}"?`)) return;
+      socket.emit(
+        'rpc',
+        { method: 'deleteRoom', params: { roomId: room._id } },
+        (err: any) => {
+          if (err) console.error(err);
+          else setRooms((rs) => rs.filter((r) => r._id !== room._id));
+        }
+      );
+    };
+
+  
+
   return (
     <div className="flex flex-col w-1/6 min-w-[100px] h-full border-r overflow-hidden">
       {/* header */}
@@ -66,19 +99,17 @@ const RoomList: React.FC<RoomListProps> = ({ socket, onRoomSelected }) => {
         Rooms
       </div>
 
-      {/* scrollable list */}
-      <ul className="flex-1 overflow-auto px-4 space-y-1 bg-gray-50">
-        {rooms.map(r => (
-          <li key={r._id}>
-            <button
-              className="w-full text-left p-2 hover:bg-gray-200 rounded"
-              onClick={() => handleJoin(r.name)}
-            >
-              {r.name}
-            </button>
-          </li>
+      <div className="flex-1 overflow-auto px-2 space-y-1 bg-gray-50">
+        {rooms.map((room) => (
+          <RoomListItem
+            key={room._id}
+            room={room}
+            onSelect={() => handleJoin(room.name)}
+            onRename={handleRename}
+            onDelete={handleDelete}
+          />
         ))}
-      </ul>
+      </div>
 
       {/* footer (input) */}
       <div className="flex-none p-4 pr-2 border-t flex bg-gray-100">

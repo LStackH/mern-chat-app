@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import Room from "../models/Room";
 import { Message } from "../models/Message";
 
+// NOT CURRENTLY IN USE
+
 // @desc    List all available rooms
 // @route   GET /api/chat/rooms
 // @access  protected

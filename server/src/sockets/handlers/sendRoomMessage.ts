@@ -37,6 +37,5 @@ export const sendRoomMessage: RPCHandler = async (io, socket, params) => {
     params: { roomId, message },
   });
 
-  // Ack back the saved message
   return message;
 };
